@@ -41,7 +41,7 @@ class FacialDetection(object):
 
 	def setImageInputShape(self):
 		""" 
-		Sets the input shape of images
+			Sets the input shape of images
 		"""
 
 		if backend.image_data_format() == "channels_first":
@@ -130,10 +130,12 @@ class FacialDetection(object):
 		samples = preprocess_input(samples, version=2)
 
 		# create a vggface model object
-		model = VGGFace(model='resnet50',
-		include_top = False,
-		input_shape = self.imageInputShape,  #(224, 224, 3),
-		pooling='softmax') # avg
+		model = VGGFace(
+			model='resnet50',
+			include_top = False,
+			input_shape = self.imageInputShape,  
+			pooling='softmax' # 'avg'
+		) 
 
 		# perform prediction
 		return  model.predict(samples)
@@ -183,7 +185,7 @@ class FacialDetection(object):
 			scores = self.calculateModelScores(faces)
 
 			self.upsertJSONFile(
-				newScores = {
+				newData = {
 					"filePaths" : filePaths,
 					"scores"    : scores.tolist()
 				} 
@@ -202,8 +204,8 @@ class FacialDetection(object):
 	def main(self, method="Haar"):
 		"""
 			Main function that calls the appropriated functions 
-			depending on the method selected
-		"""
+			depending on the selected method 
+		"""newScores
 
 		if method == "Haar":
 			return self.HaarMethod()
@@ -218,7 +220,7 @@ if __name__ == "__main__":
 		"scoreJSONPath": "JSON/scores.json",
 		"processDir"   : True
 	}
-
+newScores
 
 	app = FacialDetection(args)
 	app.main()
