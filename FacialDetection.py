@@ -74,7 +74,7 @@ class FacialDetection(object):
 
 
 	    x, y, w, h  = faces[0]
-	    xf, yf 		= x + w, y + h
+	    xf, yf 	= x + w, y + h
 
 	    face_image = Image.fromarray(img[x:xf, y:yf])
 	    face_image = face_image.resize(self.imageDimensions)
