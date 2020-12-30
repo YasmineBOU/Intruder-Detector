@@ -66,6 +66,8 @@ class IntruderDetector(object):
 		)
 
 		currentScore = app.main()
+		if not currentScore: return
+		
 		savedData = app.loadScoresFromJSONFile() 
 		finalRes  = {}
 		# print(savedData.keys())
