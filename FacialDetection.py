@@ -9,6 +9,9 @@ from keras_vggface.vggface import VGGFace
 from keras_vggface.utils import preprocess_input
 
 
+from pprint import pprint
+
+
 class FacialDetection(object):
 	
 	"""docstring for FacialDetection"""
@@ -124,6 +127,8 @@ class FacialDetection(object):
 				@faces: A numpy array of detected faces
 		"""
 
+		pprint(faces)
+		if not any(faces): return None
 		samples = numpy.asarray(faces, 'float32')
 
 		# prepare the data for the model
@@ -205,7 +210,7 @@ class FacialDetection(object):
 		"""
 			Main function that calls the appropriated functions 
 			depending on the selected method 
-		"""newScores
+		"""
 
 		if method == "Haar":
 			return self.HaarMethod()
@@ -220,7 +225,7 @@ if __name__ == "__main__":
 		"scoreJSONPath": "JSON/scores.json",
 		"processDir"   : True
 	}
-newScores
+
 
 	app = FacialDetection(args)
 	app.main()

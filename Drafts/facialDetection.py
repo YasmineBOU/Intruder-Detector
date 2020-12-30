@@ -1,5 +1,5 @@
-# import picamera
-# import picamera.array
+import picamera
+import picamera.array
 import cv2, os
 import numpy as np
 from PIL import Image
@@ -48,9 +48,10 @@ def debugAndDisplay(inputData, outputData = "TEST.png"):
         Args:
             @inputData : the file's path of the targeted image
     """
+    #pprint(inputData)
 
     PNGFile = Image.fromarray(inputData)
-    PNGFile.save(fn)
+    PNGFile.save(outputData)
 
 
 def extractROI(inputData="DATABASE/Kay/kay11.jpg"):
@@ -115,7 +116,7 @@ def get_model_scores(faces):
 
 
 def loadScores():
-    
+    pass
 
 
 def getMatching(target):
@@ -181,19 +182,21 @@ def getMatching(target):
 
 if __name__ == "__main__":
 
-    # initVar()
-    # output = getImageFromCam()
-    # roi    = extractROI(output)
-    roi    = extractROI()
+    initVar()
+    output = getImageFromCam()
+    
+    debugAndDisplay(output)
+    roi    = extractROI(output)
+    #roi    = extractROI()
     
     if DEBUG:
-        # debugAndDisplay(output)
+        debugAndDisplay(output)
         # debugAndDisplay(roi, "roi.png")
         # debugAndDisplay(roi, "roi.png")
     
         # get_model_scores(roi)
-        getMatching(
+        #getMatching(
             # target = "TEST_VALIDATION/face7.jpg"
             # target = "TEST_VALIDATION/knownFaceJenni1.jpg"
-            target = "TEST_VALIDATION/dlow7.jpg"
-        )
+         #   target = "TEST_VALIDATION/dlow7.jpg"
+        #)
