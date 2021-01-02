@@ -1,66 +1,114 @@
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <errno.h>
 #include <string.h>
-#include <arpa/inet.h>
+#include <sys/types.h>
 
+// #include <pthread.h>
 
-#define SIZE 1024
+struct sockaddr_in c_addr;
+char fname[100];
 
-void send_file(FILE *fp, int sockfd){
-  int n;
-  char data[SIZE] = {0};
+void* SendFileToServer(int *arg){
+    int connfd=(int)*arg;
+    printf("Connection accepted and id: %d\n",connfd);
+    printf("Connected to Server: %s:%d\n",inet_ntoa(c_addr.sin_addr),ntohs(c_addr.sin_port));
+    write(connfd, fname, 256);
 
-  while(fgets(data, SIZE, fp) != NULL) {
-    if (send(sockfd, data, sizeof(data), 0) == -1) {
-      perror("[-]Error in sending file.");
-      exit(1);
+    FILE *fp = fopen(fname,"rb");
+
+    if(fp == NULL){
+        printf("File open error");
+        return (void *)1;   
+    }   
+
+    /* Read data from file and send it */
+    while(1){
+        /* First read file in chunks of 256 bytes */
+        unsigned char buff[1024]={0};
+        int nread = fread(buff,1,1024,fp);
+
+        /* If read was success, send data. */
+        if(nread > 0){
+            write(connfd, buff, nread);
+        }
+        if (nread < 1024){
+            if (feof(fp)){
+                printf("End of file\n");
+                printf("File transfer completed for id: %d\n",connfd);
+            }
+            if (ferror(fp))
+                printf("Error reading\n");
+            break;
+        }
     }
-    bzero(data, SIZE);
-  }
+ 
+    printf("Closing Connection for id: %d\n",connfd);
+    close(connfd);
+    shutdown(connfd,SHUT_WR);
+    sleep(2);
 }
 
 
+int main(int argc, char *argv[]){
+ 
+    int connfd = 0,err;
+    pthread_t tid; 
+    struct sockaddr_in serv_addr;
+    int listenfd = 0,ret;
+    char sendBuff[1025];
+    int numrv;
+    size_t clen=0;
 
-int main(){
-  char *ip = "127.0.0.1";
-  int port = 8080;
-  int e;
+    listenfd = socket(AF_INET, SOCK_STREAM, 0);
+    if(listenfd<0){
+      printf("Error in socket creation\n");
+      exit(2);
+    }
 
-  int sockfd;
-  struct sockaddr_in server_addr;
-  FILE *fp;
-  char *filename = "send.txt";
+    printf("Socket retrieve success\n");
 
-  sockfd = socket(AF_INET, SOCK_STREAM, 0);
-  if(sockfd < 0) {
-    perror("[-]Error in socket");
-    exit(1);
-  }
-  printf("[+]Server socket created successfully.\n");
+    serv_addr.sin_family = AF_INET;
+    serv_addr.sin_addr.s_addr = htonl(INADDR_ANY);
+    serv_addr.sin_port = htons(5000);
 
-  server_addr.sin_family = AF_INET;
-  server_addr.sin_port = port;
-  server_addr.sin_addr.s_addr = inet_addr(ip);
+    ret = bind(listenfd, (struct sockaddr*)&serv_addr,sizeof(serv_addr));
 
-  e = connect(sockfd, (struct sockaddr*)&server_addr, sizeof(server_addr));
-  if(e == -1) {
-    perror("[-]Error in socket");
-    exit(1);
-  }
- printf("[+]Connected to Server.\n");
+    if(ret < 0){
+      printf("Error in bind\n");
+      exit(2);
+    }
 
-  fp = fopen(filename, "r");
-  if (fp == NULL) {
-    perror("[-]Error in reading file.");
-    exit(1);
-  }
+    if(listen(listenfd, 10) == -1){
+        printf("Failed to listen\n");
+        return -1;
+    }
 
-  send_file(fp, sockfd);
-  printf("[+]File data sent successfully.\n");
+    if (argc < 2)
+        strcpy(fname,"personPictured.png");
 
-  printf("[+]Closing the connection.\n");
-  close(sockfd);
+    else
+       strcpy(fname,argv[1]);
 
-  return 0;
+    while(1){
+        clen=sizeof(c_addr);
+        printf("Waiting...\n");
+        connfd = accept(listenfd, (struct sockaddr*)&c_addr,&clen);
+        
+        if(connfd<0){
+          printf("Error in accept\n");
+          continue; 
+        }
+        
+        err = pthread_create(&tid, NULL, &SendFileToServer, &connfd);
+        if (err != 0)
+            printf("\ncan't create thread :[%s]", strerror(err));
+    }
+    
+    close(connfd);
+    return 0;
 }

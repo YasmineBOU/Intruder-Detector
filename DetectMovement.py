@@ -13,6 +13,7 @@ class DetectMovement(object):
 
 	def __init__(self, args):
 
+		print("-> Initializaion part")
 		self.ledGPIO = LED(args["ledNum"])
 		self.pirGPIO = MotionSensor(args["pirNum"])
 		
@@ -35,7 +36,17 @@ class DetectMovement(object):
 
 
 	def main(self):
+		print("-> The program started")
+		# try:
+		# 	print("\t-> Attempt to take a picture")
+		# 	self.takeAndSavePicture()
 
+		# finally:
+		# 	print("\t-> Close camera")
+		# 	self.camera.close()
+		
+		# return
+		
 		while True:
 
 			self.pirGPIO.wait_for_motion()

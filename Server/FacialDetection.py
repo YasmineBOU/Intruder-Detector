@@ -73,7 +73,7 @@ class FacialDetection(object):
 	        print("'{}' : No faces were detected !".format(
 	            imageFilePath
 	        ))
-	        return None
+	        return False, None
 
 
 	    x, y, w, h  = faces[0]
@@ -82,7 +82,7 @@ class FacialDetection(object):
 	    face_image = Image.fromarray(img[x:xf, y:yf])
 	    face_image = face_image.resize(self.imageDimensions)
 	  	    
-	    return numpy.asarray(face_image)
+	    return True, numpy.asarray(face_image)
 
 
 	def getFaceRegions(self):
@@ -127,8 +127,6 @@ class FacialDetection(object):
 				@faces: A numpy array of detected faces
 		"""
 
-		pprint(faces)
-		if not any(faces): return None
 		samples = numpy.asarray(faces, 'float32')
 
 		# prepare the data for the model
@@ -199,9 +197,11 @@ class FacialDetection(object):
 			return None
 
 		else:
-
-			return self.calculateModelScores(
-				faces = [self.extractROI(self.fileToProcess)] 
+			gotFaces, faces = self.extractROI(self.fileToProcess)
+			print(gotFaces)#, faces)
+			if not gotFaces: return False, None
+			return True,  self.calculateModelScores(
+				faces = [faces] 
 			)
 
 
@@ -226,6 +226,15 @@ if __name__ == "__main__":
 		"processDir"   : True
 	}
 
+	args = {
+		# "filePath"	   : "personPictured.png",
+		"filePath"	   : "TEST_VALIDATION/face2.jpg",
+
+		"processDir"   : False
+	}
+
+
+
 
 	app = FacialDetection(args)
-	app.main()
+	pprint(app.main())

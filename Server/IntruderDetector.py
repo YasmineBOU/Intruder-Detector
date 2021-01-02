@@ -65,8 +65,8 @@ class IntruderDetector(object):
 			}
 		)
 
-		currentScore = app.main()
-		if not currentScore: return
+		gotScore, currentScore = app.main()
+		if not gotScore: return
 		
 		savedData = app.loadScoresFromJSONFile() 
 		finalRes  = {}
@@ -116,7 +116,7 @@ class IntruderDetector(object):
 
 if __name__ == "__main__":
 
-	TEST_WHOLE_DIR = True
+	TEST_WHOLE_DIR = False
 
 	testDir = "TEST_VALIDATION"
 
