@@ -1,9 +1,10 @@
-import time
+import os, time
+import subprocess
 import picamera
 from gpiozero import LED, MotionSensor
 
 
-from IntruderDetector import IntruderDetector
+# from IntruderDetector import IntruderDetector
 
 
 class DetectMovement(object):
@@ -13,11 +14,11 @@ class DetectMovement(object):
 
 	def __init__(self, args):
 
-		print("-> Initializaion part")
+		print("-> Initialization part")
 		self.ledGPIO = LED(args["ledNum"])
 		self.pirGPIO = MotionSensor(args["pirNum"])
 		
-		self.camera  = picamera.PiCamera() 
+		# self.camera  = picamera.PiCamera() 
 
 		self.ledGPIO.off()
 
@@ -29,8 +30,8 @@ class DetectMovement(object):
 		"""
 		"""
 		# imagePath = time.strftime("%Y-%b-%d_(%H%M%S).png")
-		imagePath = time.strftime("personPictured.png")
-		self.camera.capture(imagePath)
+		imagePath = "personPictured.png"
+		# self.camera.capture(imagePath)
 		return imagePath 
 
 
@@ -50,13 +51,18 @@ class DetectMovement(object):
 		while True:
 
 			self.pirGPIO.wait_for_motion()
-			print("Motion detected !")
+			print("\nMotion detected !")
 			self.ledGPIO.on()
 			imagePath = self.takeAndSavePicture()
 
-			IntruderDetector({
-				"imageFilePath" : imagePath
-			})
+			# IntruderDetector({
+			# 	"imageFilePath" : imagePath
+			# })
+
+			cmd = "./client"
+
+			subprocess.call(cmd, shell=True)
+
 
 			time.sleep(5)
 

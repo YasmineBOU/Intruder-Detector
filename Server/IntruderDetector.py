@@ -1,6 +1,6 @@
 # import picamera
 # import picamera.array
-import cv2, os
+import cv2, os, sys
 import numpy as np
 from PIL import Image
 from scipy.spatial.distance import cosine
@@ -37,7 +37,7 @@ class IntruderDetector(object):
 		# self.CAMERA = picamera.PiCamera() 
 		
 
-		self.main()
+		
 
 
 
@@ -145,6 +145,15 @@ if __name__ == "__main__":
 
 	else:
 
-		app = IntruderDetector({
-			"imageFilePath" : "TEST_VALIDATION/face1.jpg" #"TEST_VALIDATION/dlow7.jpg"
-		})
+		imageFilePath = "TEST_VALIDATION/face1.jpg" #"TEST_VALIDATION/dlow7.jpg"
+		outFilePath   = "Result_IntruderDetector.txt"
+
+		if len(sys.argv) == 2:
+			imageFilePath = sys.argv[1] 
+
+		result = IntruderDetector({
+			"imageFilePath" : imageFilePath
+		}).main()
+
+		with open(outFilePath, "w") as file:
+			file.write(str(result))
